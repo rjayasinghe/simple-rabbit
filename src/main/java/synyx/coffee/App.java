@@ -27,7 +27,7 @@ public class App
             conn = Optional.of(factory.newConnection());
             channel = Optional.of(conn.get().createChannel());
             channel.get().queueDeclare(QUEUE_NAME, false, false, false, null);
-            String message = "Hello World!";
+            String message = "blaahhh";
             channel.get().basicPublish("", QUEUE_NAME, null, message.getBytes());
             System.out.println(" [x] Sent '" + message + "'");
         }

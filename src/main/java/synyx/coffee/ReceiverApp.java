@@ -16,32 +16,22 @@ public class ReceiverApp {
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
         Optional<Connection > conn = Optional.empty();
         Optional<Channel> channel = Optional.empty();
-        try {
-            ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("192.168.99.100");
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost("192.168.99.100");
 
-            conn = Optional.of(factory.newConnection());
-            channel = Optional.of(conn.get().createChannel());
+        conn = Optional.of(factory.newConnection());
+        channel = Optional.of(conn.get().createChannel());
 
-            channel.get().queueDeclare(QUEUE_NAME, false, false, false, null);
-            System.out.println("waiting for messages.");
+        channel.get().queueDeclare(QUEUE_NAME, false, false, false, null);
+        System.out.println("waiting for messages.");
 
-            Consumer firstConsumer = new DefaultConsumer(channel.get()) {
-                public void handleDelivery(String s, Envelope envelope,
-                       AMQP.BasicProperties basicProperties, byte[] bytes) throws IOException {
-                    String receivedMsg = new String(bytes, "UTF-8");
-                    System.out.println("received message" + receivedMsg);
-                }
-            };
-            channel.get().basicConsume(QUEUE_NAME, true, firstConsumer);
-        }
-        finally {
-            if(channel.isPresent()) {
-                channel.get().close();
+        Consumer firstConsumer = new DefaultConsumer(channel.get()) {
+            public void handleDelivery(String s, Envelope envelope,
+                   AMQP.BasicProperties basicProperties, byte[] bytes) throws IOException {
+                String receivedMsg = new String(bytes, "UTF-8");
+                System.out.println("received message " + receivedMsg);
             }
-            if(conn.isPresent()) {
-                conn.get().close();
-            }
-        }
+        };
+        channel.get().basicConsume(QUEUE_NAME, true, firstConsumer);
     }
 }
