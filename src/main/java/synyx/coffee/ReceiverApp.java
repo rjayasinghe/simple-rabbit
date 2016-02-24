@@ -1,7 +1,6 @@
 package synyx.coffee;
 
 import com.rabbitmq.client.*;
-import com.sun.tools.javac.main.Option;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -11,7 +10,7 @@ import java.util.concurrent.TimeoutException;
  * Created by jayasinghe on 22/02/16.
  */
 public class ReceiverApp {
-    private static final String QUEUE_NAME = "hurz";
+    private static final String QUEUE_NAME = "DEMO";
 
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
         Optional<Connection > conn = Optional.empty();
@@ -30,8 +29,21 @@ public class ReceiverApp {
                    AMQP.BasicProperties basicProperties, byte[] bytes) throws IOException {
                 String receivedMsg = new String(bytes, "UTF-8");
                 System.out.println("received message " + receivedMsg);
+                try {
+                    doWork(receivedMsg);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    System.out.println("done! :)");
+                }
             }
         };
         channel.get().basicConsume(QUEUE_NAME, true, firstConsumer);
+    }
+
+    private static void doWork(String task) throws InterruptedException {
+        for (char ch: task.toCharArray()) {
+            if (ch == '.') Thread.sleep(1000);
+        }
     }
 }

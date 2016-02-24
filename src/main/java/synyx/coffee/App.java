@@ -14,7 +14,29 @@ import java.util.concurrent.TimeoutException;
  */
 public class App 
 {
-    private static final String QUEUE_NAME = "hurz";
+    private static final String QUEUE_NAME = "DEMO";
+
+    private static String getMessage(String[] messageParts) {
+        if(messageParts.length < 1) {
+            return "hello world!";
+        }
+        else {
+            return joinStrings(messageParts, " ");
+        }
+    }
+
+    private static String joinStrings(String[] messageParts, String delimiter) {
+        if(messageParts.length == 0) {
+            return "";
+        }
+        else {
+            StringBuilder builder = new StringBuilder(messageParts[0]);
+            for (int i=1; i < messageParts.length; ++i) {
+                builder.append(delimiter).append(messageParts[i]);
+            }
+            return builder.toString();
+        }
+    }
 
     public static void main( String[] args ) throws IOException, TimeoutException
     {
@@ -27,9 +49,9 @@ public class App
             conn = Optional.of(factory.newConnection());
             channel = Optional.of(conn.get().createChannel());
             channel.get().queueDeclare(QUEUE_NAME, false, false, false, null);
-            String message = "blaahhh";
+            String message = getMessage(args);
             channel.get().basicPublish("", QUEUE_NAME, null, message.getBytes());
-            System.out.println(" [x] Sent '" + message + "'");
+            System.out.println(" [x] Sent '" + message + "' to queue " + QUEUE_NAME);
         }
         finally {
             if(channel.isPresent()) {
